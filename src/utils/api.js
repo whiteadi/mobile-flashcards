@@ -1,5 +1,6 @@
 import { AsyncStorage } from "react-native";
-import { DECKS } from "../constants";
+
+const DECKS = 'flashcards:decks';
 
 export function getDecks() {
   return AsyncStorage.getItem(DECKS);

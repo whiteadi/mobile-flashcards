@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { clearLocalNotification, setLocalNotification } from "../utils";
 import { getDeck } from "../utils/api";
 import { NavigationActions } from "react-navigation";
 import _ from "lodash";
@@ -48,6 +49,10 @@ class Quiz extends Component {
   };
 
   componentDidMount() {
+    this.startQuiz();
+  }
+
+  startQuiz() {
     const { title } = this.props.navigation.state.params;
 
     getDeck(title).then(deck => {
@@ -55,7 +60,7 @@ class Quiz extends Component {
         question.correct = null;
         return question;
       });
-      this.setState(() => ({ questions }));
+      this.setState(() => ({ questions, done: false, showAnswer: false }));
     });
   }
 
@@ -85,6 +90,7 @@ class Quiz extends Component {
       score = `You got ${correctAnswers} right from ${
         questions.length
       } questions.`;
+      clearLocalNotification().then(setLocalNotification);
     }
     return (
       <View style={styles.container}>
@@ -124,22 +130,10 @@ class Quiz extends Component {
         {this.state.done && (
           <View>
             <Text style={styles.header}>{score}</Text>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate("Quiz", {
-                  title: this.props.navigation.state.params.title
-                })
-              }
-            >
+            <TouchableOpacity onPress={() => this.startQuiz()}>
               <Text style={styles.subHeaderRestart}>Restart Quiz</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate("DeckDetail", {
-                  title: this.props.navigation.state.params.title
-                })
-              }
-            >
+            <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
               <Text style={styles.subHeaderRestart}>Back to Deck</Text>
             </TouchableOpacity>
           </View>
